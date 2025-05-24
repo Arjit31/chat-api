@@ -126,17 +126,20 @@ wss.on("connection", function connection(socket) {
         createdAt: message.createdAt,
         isSent: false,
         success: true,
+        username: message.user.name
       };
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
           if (client === socket) {
+            const userMessage = commonMessage;
+            userMessage.isSent = true;
+            userMessage.username = null;
+            userMessage.orderNo += message.randomNo;
             const sentData = JSON.stringify(commonMessage);
             client.send(sentData);
           }
           else{
-            const userMessage = {...commonMessage, username: message.user.name || "Unknown"}
-            userMessage.orderNo += message.randomNo;
-            const sentData = JSON.stringify(userMessage);
+            const sentData = JSON.stringify(commonMessage);
             client.send(sentData);
           }
         }
