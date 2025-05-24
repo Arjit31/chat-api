@@ -1,16 +1,42 @@
-import express from "express";
+import express, { Request } from "express";
 import http from "http"
 import WebSocket, { WebSocketServer } from "ws";
 import { PrismaClient } from "@prisma/client";
+import cors from "cors"
 
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
+app.use(cors())
+
 const prisma = new PrismaClient();
 
 app.get("/", function (req, res) {
   res.json("hii");
 });
+
+type Params = {
+  lastNo: number;
+  type: "Anonymous" | "Reveal";
+}
+
+app.get("/fetch-broadcast", async function(req: Request<{}, {}, {}, Params>, res){
+  const type = req.query.type;
+  const lastNo = Number(req.query.lastNo);
+  if (!type || isNaN(lastNo)) {
+  res.status(400).json({ error: "Invalid type or lastNo" });
+  return;
+  }
+  const data = await prisma.broadcastMessage.findMany({
+    where: {
+      serialNo: {
+        gt: lastNo
+      },
+      type: type
+    }
+  })
+  res.json(data);
+})
 
 app.post("/signup", async function (req, res) {
   const data = req.body;
@@ -66,7 +92,7 @@ wss.on("connection", function connection(socket) {
     }
   });
   
-  socket.send("something");
+  socket.send(`{"text": "something"}`);
 });
 
 // server.on('upgrade', function upgrade(request, socket, head) {
