@@ -49,9 +49,8 @@ app.get(
         const base = {
           id: msg.id,
           serialNo: msg.serialNo,
-          orderNo: msg.userId !== id
-            ? msg.serialNo - msg.randomNo
-            : msg.serialNo,
+          orderNo:
+            msg.userId !== id ? msg.serialNo - msg.randomNo : msg.serialNo,
           text: msg.text,
           type: msg.type,
           createdAt: msg.createdAt,
@@ -105,20 +104,41 @@ wss.on("connection", function connection(socket) {
       userId: string;
     } = {
       randomNo: num,
-      type: received.type === 1 ? "Reveal" : "Anonymous",
+      type: received.type ? "Reveal" : "Anonymous",
       text: received.text,
       userId: received.userId,
     };
+
     try {
       const message = await prisma.broadcastMessage.create({
         data: broadcast,
+        include: {
+          user: true,
+        },
       });
       console.log("received: ", message);
-      const sentMessage = { ...message, success: true };
-      const sentData = JSON.stringify(sentMessage);
+      const commonMessage = {
+        id: message.id,
+        serialNo: message.serialNo,
+        orderNo: message.serialNo-message.randomNo,
+        text: message.text,
+        type: message.type,
+        createdAt: message.createdAt,
+        isSent: false,
+        success: true,
+      };
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(sentData);
+          if (client === socket) {
+            const sentData = JSON.stringify(commonMessage);
+            client.send(sentData);
+          }
+          else{
+            const userMessage = {...commonMessage, username: message.user.name || "Unknown"}
+            userMessage.orderNo += message.randomNo;
+            const sentData = JSON.stringify(userMessage);
+            client.send(sentData);
+          }
         }
       });
     } catch (error) {
