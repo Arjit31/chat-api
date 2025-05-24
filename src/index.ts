@@ -104,7 +104,7 @@ wss.on("connection", function connection(socket) {
       userId: string;
     } = {
       randomNo: num,
-      type: received.type ? "Reveal" : "Anonymous",
+      type: received.type,
       text: received.text,
       userId: received.userId,
     };
