@@ -49,7 +49,9 @@ app.get(
         const base = {
           id: msg.id,
           serialNo: msg.serialNo,
-          randomNo: msg.randomNo,
+          orderNo: msg.userId !== id
+            ? msg.serialNo - msg.randomNo
+            : msg.serialNo,
           text: msg.text,
           type: msg.type,
           createdAt: msg.createdAt,
