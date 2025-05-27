@@ -11,8 +11,8 @@ app.use(cors());
 
 const prisma = new PrismaClient();
 
-app.get("/", function (req, res) {
-  res.json("hii");
+app.get("/", async function (req, res) {
+  res.json("hello")
 });
 
 type Params = {
@@ -120,25 +120,24 @@ wss.on("connection", function connection(socket) {
       const commonMessage = {
         id: message.id,
         serialNo: message.serialNo,
-        orderNo: message.serialNo-message.randomNo,
+        orderNo: message.serialNo - message.randomNo,
         text: message.text,
         type: message.type,
         createdAt: message.createdAt,
         isSent: false,
         success: true,
-        username: message.user.name
+        username: message.user.name,
       };
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
           if (client === socket) {
             const userMessage = commonMessage;
             userMessage.isSent = true;
-            userMessage.username = null;
+            userMessage.username = "";
             userMessage.orderNo += message.randomNo;
             const sentData = JSON.stringify(commonMessage);
             client.send(sentData);
-          }
-          else{
+          } else {
             const sentData = JSON.stringify(commonMessage);
             client.send(sentData);
           }

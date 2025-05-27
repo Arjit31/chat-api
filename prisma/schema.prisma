@@ -14,18 +14,26 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  name           String?
-  email          String?  @unique
-  googleId       String?  @unique
-  profilePicture String?
-  location       String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   broadcasts       BroadcastMessage[]
   sentMessages     PersonalMessage[]  @relation("SentMessages")
   receivedMessages PersonalMessage[]  @relation("ReceivedMessages")
+  tokens Token[]
+}
+
+model Token {
+  id String @id @default(uuid())
+  refreshTokenId String @unique
+  connectionTokenId String @unique
+  isUsedConnectionToken Boolean
+  userId String
+  user User @relation(fields: [userId], references: [id])
 }
 
 model BroadcastMessage {
@@ -36,7 +44,7 @@ model BroadcastMessage {
   type      MessageType
   createdAt DateTime    @default(now())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 }
 
@@ -45,10 +53,10 @@ model PersonalMessage {
   text      String
   createdAt DateTime @default(now())
 
-  fromUser   User   @relation("SentMessages", fields: [fromUserId], references: [id])
+  fromUser   User   @relation("SentMessages", fields: [fromUserId], references: [id], onDelete: Cascade)
   fromUserId String
 
-  toUser   User   @relation("ReceivedMessages", fields: [toUserId], references: [id])
+  toUser   User   @relation("ReceivedMessages", fields: [toUserId], references: [id], onDelete: Cascade)
   toUserId String
 }
 
