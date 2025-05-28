@@ -1,91 +1,16 @@
 import express, { Request } from "express";
 import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
-import { PrismaClient } from "@prisma/client";
+import {prisma} from "./prismaSingletonClient"
 import cors from "cors";
+import { rootRouter } from "./routes/root";
 
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
 app.use(cors());
 
-const prisma = new PrismaClient();
-
-app.get("/", async function (req, res) {
-  res.json("hello")
-});
-
-type Params = {
-  lastNo: number;
-  type: "Anonymous" | "Reveal";
-  userId: string;
-};
-
-app.get(
-  "/fetch-broadcast",
-  async function (req: Request<{}, {}, {}, Params>, res) {
-    const type = req.query.type;
-    const id = req.query.userId;
-    const lastNo = Number(req.query.lastNo);
-    if (!type || isNaN(lastNo) || !id) {
-      res.status(400).json({ error: "Invalid type, lastNo, or userId" });
-      return;
-    }
-
-    try {
-      const messages = await prisma.broadcastMessage.findMany({
-        where: {
-          serialNo: {
-            gt: lastNo,
-          },
-          type: type,
-        },
-        include: {
-          user: true,
-        },
-      });
-
-      const response = messages.map((msg) => {
-        const base = {
-          id: msg.id,
-          serialNo: msg.serialNo,
-          orderNo:
-            msg.userId !== id ? msg.serialNo - msg.randomNo : msg.serialNo,
-          text: msg.text,
-          type: msg.type,
-          createdAt: msg.createdAt,
-          isSent: msg.userId === id,
-        };
-
-        if (msg.type === "Reveal") {
-          return {
-            ...base,
-            username: msg.user.name || "Unknown",
-          };
-        } else {
-          return base;
-        }
-      });
-
-      res.json(response);
-    } catch (err) {
-      console.error("Error fetching messages:", err);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  }
-);
-
-app.post("/signup", async function (req, res) {
-  const data = req.body;
-  try {
-    const user = await prisma.user.create({
-      data: data,
-    });
-    res.json(user);
-  } catch (error) {
-    res.json(error);
-  }
-});
+app.use("/api/v1", rootRouter);
 
 const wss = new WebSocketServer({ server });
 

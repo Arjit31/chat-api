@@ -50,14 +50,16 @@ const http_1 = __importDefault(require("http"));
 const ws_1 = __importStar(require("ws"));
 const client_1 = require("@prisma/client");
 const cors_1 = __importDefault(require("cors"));
+const root_1 = require("./routes/root");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 const prisma = new client_1.PrismaClient();
+app.use("/api/v1", root_1.rootRouter);
 app.get("/", function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield prisma.user.deleteMany({});
+        res.json("hello");
     });
 });
 app.get("/fetch-broadcast", function (req, res) {
@@ -160,7 +162,7 @@ wss.on("connection", function connection(socket) {
                         if (client === socket) {
                             const userMessage = commonMessage;
                             userMessage.isSent = true;
-                            userMessage.username = null;
+                            userMessage.username = "";
                             userMessage.orderNo += message.randomNo;
                             const sentData = JSON.stringify(commonMessage);
                             client.send(sentData);
