@@ -24,16 +24,16 @@ model User {
   broadcasts       BroadcastMessage[]
   sentMessages     PersonalMessage[]  @relation("SentMessages")
   receivedMessages PersonalMessage[]  @relation("ReceivedMessages")
-  tokens Token[]
+  tokens           Token[]
 }
 
 model Token {
-  id String @id @default(uuid())
-  refreshTokenId String @unique
-  connectionTokenId String @unique
+  id                    String  @id @default(uuid())
+  refreshTokenId        String  @unique
+  connectionTokenId     String  @unique
   isUsedConnectionToken Boolean
-  userId String @unique
-  user User @relation(fields: [userId], references: [id])
+  userId                String  @unique
+  user                  User    @relation(fields: [userId], references: [id])
 }
 
 model BroadcastMessage {
@@ -51,6 +51,7 @@ model BroadcastMessage {
 model PersonalMessage {
   id        String   @id @default(cuid())
   text      String
+  serialNo  Int      @default(autoincrement())
   createdAt DateTime @default(now())
 
   fromUser   User   @relation("SentMessages", fields: [fromUserId], references: [id], onDelete: Cascade)

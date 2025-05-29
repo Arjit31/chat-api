@@ -1,28 +1,22 @@
 import { Request, Response } from "express";
-import {prisma} from "../prismaSingletonClient"
+import { prisma } from "../prismaSingletonClient";
+import { authMiddleware } from "../middleware/auth";
+import { Router } from "express";
 
-const express = require("express");
+// const express = require("express");
 
-export const messageRouter = express.Router();
+export const broadcastRouter = Router();
 
-type Params = {
-  lastNo: number;
-  type: "Anonymous" | "Reveal";
-  userId: string;
-};
-
-
-messageRouter.get("/", function (req : Request, res: Response) {
+broadcastRouter.get("/", function (req: Request, res: Response) {
   res.send("Message home page");
 });
 
-messageRouter.get(
-  "/fetch-broadcast",
-  async function (req: Request<{}, {}, {}, Params>, res: Response) {
-    const type = req.query.type;
-    const id = req.query.userId;
+broadcastRouter.get("/fetch-broadcast", authMiddleware,
+  async function (req: Request, res: Response) {
+    const type = "" + req.query.type;
+    const id = "" + res.locals.userId;
     const lastNo = Number(req.query.lastNo);
-    if (!type || isNaN(lastNo) || !id) {
+    if (!type || (type != "Anonymous" && type != "Reveal") || isNaN(lastNo) || !id) {
       res.status(400).json({ error: "Invalid type, lastNo, or userId" });
       return;
     }

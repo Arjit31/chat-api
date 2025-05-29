@@ -2,10 +2,9 @@ import { Request, Response } from "express";
 import { prisma } from "../prismaSingletonClient";
 import { UserSignupSchema, UserSignupType, UserSigninSchema, UserSigninType } from "../types/User";
 import { createAllToken, refreshAccessToken, refreshAllToken } from "../lib/tokens";
+import { Router } from "express";
 
-const express = require("express");
-
-export const authRouter = express.Router();
+export const authRouter = Router();
 
 authRouter.get("/", async function (req: Request, res: Response) {
   res.send("Auth home page");
