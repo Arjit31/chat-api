@@ -30,6 +30,8 @@ authRouter.post("/signup", async function (req: Request, res: Response) {
       refreshToken: tokens.refreshToken,
       connectionToken: tokens.connectionToken,
       accessToken: tokens.accessToken,
+      name: user.name,
+      id: user.id
     });
   } catch (error) {
     console.log(error);
@@ -63,6 +65,8 @@ authRouter.post("/signin", async function (req: Request, res: Response) {
       refreshToken: tokens.refreshToken,
       connectionToken: tokens.connectionToken,
       accessToken: tokens.accessToken,
+      name: user.name,
+      id: user.id
     });
   } catch (error) {
     console.log(error);
