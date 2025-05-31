@@ -6,6 +6,7 @@ type objIdType = {
   map: Map<string, WebSocket>;
 };
 
+
 export async function broadcastHandler(
   wss: WebSocket.Server<typeof WebSocket, typeof http.IncomingMessage>,
   received: any,
@@ -18,7 +19,7 @@ export async function broadcastHandler(
       !received.type ||
       !received.text ||
       !received.userId ||
-      !objId.map.has(received.fromUserId) ||
+      !objId.map.has(received.userId) ||
       objId.map.get(received.userId) !== socket
     ) {
       const obj = {
