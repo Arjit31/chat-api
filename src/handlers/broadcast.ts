@@ -26,6 +26,8 @@ export async function broadcastHandler(
         message: "Invalid Request",
       };
       const sendMessage = JSON.stringify(obj);
+      console.log(sendMessage, received);
+      console.log(objId);
       socket.send(sendMessage);
       socket.close();
       return;
