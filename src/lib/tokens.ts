@@ -23,7 +23,7 @@ function signConnectionToken(connectionId: string, userId: string) {
       type: "connection",
     },
     "" + process.env.JWT_SECRET,
-    { expiresIn: "2m" }
+    { expiresIn: "5m" }
   );
   return connectionToken;
 }
