@@ -63,6 +63,7 @@ export async function broadcastHandler(
       isSent: false,
       success: true,
       username: message.user.name,
+      userId: message.user.id
     };
     wss.clients.forEach(function each(client: WebSocket) {
       if (client.readyState === WebSocket.OPEN) {
@@ -70,6 +71,7 @@ export async function broadcastHandler(
           const userMessage = commonMessage;
           userMessage.isSent = true;
           userMessage.username = "";
+          userMessage.userId = ""
           userMessage.orderNo += message.randomNo;
           const sentData = JSON.stringify(userMessage);
           client.send(sentData);
