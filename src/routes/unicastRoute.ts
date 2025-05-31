@@ -11,6 +11,7 @@ unicastRouter.get(
     const fromUserId = "" + res.locals.userId;
     const toUserId = "" + req.query.toUserId;
     const lastNo = Number(req.query.lastNo);
+    console.log(fromUserId, toUserId, lastNo);
     if (!fromUserId || !toUserId || isNaN(lastNo)) {
       res.status(400).json({ error: "Invalid sender, lastNo, or receiver id!" });
       return;

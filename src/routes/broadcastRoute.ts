@@ -16,6 +16,7 @@ broadcastRouter.get("/fetch-broadcast", authMiddleware,
     const type = "" + req.query.type;
     const id = "" + res.locals.userId;
     const lastNo = Number(req.query.lastNo);
+    console.log(type, id, lastNo);
     if (!type || (type != "Anonymous" && type != "Reveal") || isNaN(lastNo) || !id) {
       res.status(400).json({ error: "Invalid type, lastNo, or userId" });
       return;
