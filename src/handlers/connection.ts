@@ -35,7 +35,9 @@ export async function connectionHandler(
         isUsedConnectionToken: true
       }
     })
+    console.log(decoded);
     objId.map.set("" + decoded?.sub, socket);
+    console.log(objId.map.has(decoded?.sub + ""))
     const obj = {
       success: true,
       message: "connection established, token approved!",
