@@ -19,7 +19,7 @@ export async function broadcastHandler(
       !received.text ||
       !received.userId ||
       !objId.map.has(received.fromUserId) ||
-      objId.map.get(received.userId) != socket
+      objId.map.get(received.userId) !== socket
     ) {
       const obj = {
         success: false,
@@ -27,7 +27,7 @@ export async function broadcastHandler(
       };
       const sendMessage = JSON.stringify(obj);
       console.log(sendMessage, received);
-      // console.log(objId.map.get(received.userId));
+      console.log(objId.map.get(received.userId) === socket);
       console.log(objId.map.has(received.userId));
       socket.send(sendMessage);
       socket.close();
