@@ -49,7 +49,8 @@ broadcastRouter.get("/fetch-broadcast", authMiddleware,
         if (msg.type === "Reveal") {
           return {
             ...base,
-            username: msg.user.name || "Unknown",
+            username: msg.user.name,
+            userId: msg.user.id
           };
         } else {
           return base;
