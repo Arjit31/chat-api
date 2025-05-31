@@ -38,7 +38,7 @@ export async function connectionHandler(
     objId.map.set("" + decoded?.sub, socket);
     const obj = {
       success: true,
-      message: "connection established!",
+      message: "connection established, token approved!",
     };
     const sendMessage = JSON.stringify(obj);
     socket.send(sendMessage);

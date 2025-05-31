@@ -1,7 +1,16 @@
 import { Request, Response } from "express";
 import { prisma } from "../prismaSingletonClient";
-import { UserSignupSchema, UserSignupType, UserSigninSchema, UserSigninType } from "../types/User";
-import { createAllToken, refreshAccessToken, refreshAllToken } from "../lib/tokens";
+import {
+  UserSignupSchema,
+  UserSignupType,
+  UserSigninSchema,
+  UserSigninType,
+} from "../types/User";
+import {
+  createAllToken,
+  refreshAccessToken,
+  refreshAllToken,
+} from "../lib/tokens";
 import { Router } from "express";
 
 export const authRouter = Router();
@@ -31,7 +40,7 @@ authRouter.post("/signup", async function (req: Request, res: Response) {
       connectionToken: tokens.connectionToken,
       accessToken: tokens.accessToken,
       name: user.name,
-      id: user.id
+      id: user.id,
     });
   } catch (error) {
     console.log(error);
@@ -49,11 +58,11 @@ authRouter.post("/signin", async function (req: Request, res: Response) {
     const user = await prisma.user.findFirst({
       where: {
         username: data.username,
-        password: data.password
-      }
+        password: data.password,
+      },
     });
-    if(!user){
-      throw new Error("No user found!")
+    if (!user) {
+      throw new Error("No user found!");
     }
     const tokens = await createAllToken(user.id);
     if (!tokens.success) {
@@ -66,7 +75,7 @@ authRouter.post("/signin", async function (req: Request, res: Response) {
       connectionToken: tokens.connectionToken,
       accessToken: tokens.accessToken,
       name: user.name,
-      id: user.id
+      id: user.id,
     });
   } catch (error) {
     console.log(error);
@@ -89,15 +98,18 @@ authRouter.put("/refreshTokens", async function (req: Request, res: Response) {
   }
 });
 
-authRouter.put("/refreshAccessToken", async function (req: Request, res: Response) {
-  const { refreshToken }: { refreshToken: string } = req.body;
-  const newTokens = await refreshAccessToken(refreshToken);
-  if (newTokens.success) {
-    res.json({
-      success: true,
-      accessToken: newTokens.accessToken,
-    });
-  } else {
-    res.status(400).json({ success: false, message: "" + newTokens.error });
+authRouter.put(
+  "/refreshAccessToken",
+  async function (req: Request, res: Response) {
+    const { refreshToken }: { refreshToken: string } = req.body;
+    const newTokens = await refreshAccessToken(refreshToken);
+    if (newTokens.success) {
+      res.json({
+        success: true,
+        accessToken: newTokens.accessToken,
+      });
+    } else {
+      res.status(400).json({ success: false, message: "" + newTokens.error });
+    }
   }
-});
+);
