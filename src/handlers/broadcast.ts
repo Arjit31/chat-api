@@ -27,7 +27,7 @@ export async function broadcastHandler(
       };
       const sendMessage = JSON.stringify(obj);
       console.log(sendMessage, received);
-      console.log(objId.map.get(received.userId));
+      // console.log(objId.map.get(received.userId));
       console.log(objId.map.has(received.userId));
       socket.send(sendMessage);
       socket.close();
