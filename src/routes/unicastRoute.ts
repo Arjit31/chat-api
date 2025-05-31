@@ -5,18 +5,22 @@ import { prisma } from "../prismaSingletonClient";
 export const unicastRouter = Router();
 
 unicastRouter.get(
-  "/fetch-broadcast",
+  "/fetch-unicast",
   authMiddleware,
   async function (req: Request, res: Response) {
-    const fromUserId = "" + res.locals.fromUserId;
-    const toUserId = "" + res.locals.toUserId;
-    if (!fromUserId || !toUserId) {
-      res.status(400).json({ error: "Invalid sender or receiver id!" });
+    const fromUserId = "" + res.locals.userId;
+    const toUserId = "" + req.query.toUserId;
+    const lastNo = Number(req.query.lastNo);
+    if (!fromUserId || !toUserId || isNaN(lastNo)) {
+      res.status(400).json({ error: "Invalid sender, lastNo, or receiver id!" });
       return;
     }
     try {
       const messages = await prisma.personalMessage.findMany({
         where: {
+          serialNo: {
+            gt: lastNo,
+          },
           fromUserId: fromUserId,
           toUserId: toUserId,
         },
