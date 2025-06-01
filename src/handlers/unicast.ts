@@ -49,10 +49,14 @@ export async function unicastHandler(
     const sendObj = {
       id: personalMessage.id,
       serialNo: personalMessage.serialNo,
+      orderNo: personalMessage.serialNo,
+      type: "personal",
       text: personalMessage.text,
       createdAt: personalMessage.createdAt,
       success: true,
       isSent: true,
+      username: "",
+      userId: personalMessage.fromUserId
     };
     objId.map.get(received.fromUserId)?.send(JSON.stringify(sendObj));
     sendObj.isSent = false;
