@@ -13,20 +13,45 @@ unicastRouter.get(
     const lastNo = Number(req.query.lastNo);
     console.log("unicast", fromUserId, toUserId, lastNo);
     if (!fromUserId || !toUserId || isNaN(lastNo)) {
-      res.status(400).json({ error: "Invalid sender, lastNo, or receiver id!" });
+      res
+        .status(400)
+        .json({ error: "Invalid sender, lastNo, or receiver id!" });
       return;
     }
     try {
       const messages = await prisma.personalMessage.findMany({
         where: {
-          serialNo: {
-            gt: lastNo,
-          },
-          fromUserId: fromUserId,
-          toUserId: toUserId,
+          OR: [
+            {
+              serialNo: {
+                gt: lastNo,
+              },
+              fromUserId: fromUserId,
+              toUserId: toUserId,
+            },
+            {
+              serialNo: {
+                gt: lastNo,
+              },
+              fromUserId: toUserId,
+              toUserId: fromUserId,
+            },
+          ],
         },
       });
-      res.json(messages);
+      const response = messages.map((msg) => {
+        const base = {
+          id: msg.id,
+          serialNo: msg.serialNo,
+          orderNo: msg.serialNo,
+          text: msg.text,
+          type: "personal",
+          createdAt: msg.createdAt,
+          isSent: msg.fromUserId === fromUserId,
+        };
+        return base;
+      });
+      res.json(response);
     } catch (error) {
       console.error("Error fetching messages:", error);
       res.status(500).json({ error: "Internal server error" });
