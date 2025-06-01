@@ -11,29 +11,52 @@ broadcastRouter.get("/", function (req: Request, res: Response) {
   res.send("Message home page");
 });
 
-broadcastRouter.get("/fetch-broadcast", authMiddleware,
+broadcastRouter.get(
+  "/fetch-broadcast",
+  authMiddleware,
   async function (req: Request, res: Response) {
     const type = "" + req.query.type;
+    const limit = Number(req.query.limit);
     const id = "" + res.locals.userId;
     const lastNo = Number(req.query.lastNo);
     console.log(type, id, lastNo);
-    if (!type || (type != "Anonymous" && type != "Reveal") || isNaN(lastNo) || !id) {
+    if (
+      !type ||
+      (type != "Anonymous" && type != "Reveal") ||
+      isNaN(lastNo) ||
+      isNaN(limit) ||
+      !id
+    ) {
       res.status(400).json({ error: "Invalid type, lastNo, or userId" });
       return;
     }
 
     try {
-      const messages = await prisma.broadcastMessage.findMany({
-        where: {
-          serialNo: {
-            gt: lastNo,
-          },
-          type: type,
-        },
-        include: {
-          user: true,
-        },
-      });
+      const messages =
+        limit === -1
+          ? await prisma.broadcastMessage.findMany({
+              where: {
+                serialNo: {
+                  gt: lastNo,
+                },
+                type: type,
+              },
+              include: {
+                user: true,
+              },
+            })
+          : await prisma.broadcastMessage.findMany({
+              where: {
+                serialNo: {
+                  gt: lastNo,
+                },
+                type: type,
+              },
+              include: {
+                user: true,
+              },
+              take: limit,
+            });
 
       const response = messages.map((msg) => {
         const base = {
@@ -51,7 +74,7 @@ broadcastRouter.get("/fetch-broadcast", authMiddleware,
           return {
             ...base,
             username: msg.user.name,
-            userId: msg.user.id
+            userId: msg.user.id,
           };
         } else {
           return base;

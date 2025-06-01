@@ -11,34 +11,58 @@ unicastRouter.get(
     const fromUserId = "" + res.locals.userId;
     const toUserId = "" + req.query.toUserId;
     const lastNo = Number(req.query.lastNo);
+    const limit = Number(req.query.limit);
     console.log("unicast", fromUserId, toUserId, lastNo);
-    if (!fromUserId || !toUserId || isNaN(lastNo)) {
+    if (!fromUserId || !toUserId || isNaN(lastNo) || isNaN(limit)) {
       res
         .status(400)
         .json({ error: "Invalid sender, lastNo, or receiver id!" });
       return;
     }
     try {
-      const messages = await prisma.personalMessage.findMany({
-        where: {
-          OR: [
-            {
-              serialNo: {
-                gt: lastNo,
+      const messages =
+        limit === -1
+          ? await prisma.personalMessage.findMany({
+              where: {
+                OR: [
+                  {
+                    serialNo: {
+                      gt: lastNo,
+                    },
+                    fromUserId: fromUserId,
+                    toUserId: toUserId,
+                  },
+                  {
+                    serialNo: {
+                      gt: lastNo,
+                    },
+                    fromUserId: toUserId,
+                    toUserId: fromUserId,
+                  },
+                ],
               },
-              fromUserId: fromUserId,
-              toUserId: toUserId,
-            },
-            {
-              serialNo: {
-                gt: lastNo,
+            })
+          : await prisma.personalMessage.findMany({
+              where: {
+                OR: [
+                  {
+                    serialNo: {
+                      gt: lastNo,
+                    },
+                    fromUserId: fromUserId,
+                    toUserId: toUserId,
+                  },
+                  {
+                    serialNo: {
+                      gt: lastNo,
+                    },
+                    fromUserId: toUserId,
+                    toUserId: fromUserId,
+                  },
+                ],
               },
-              fromUserId: toUserId,
-              toUserId: fromUserId,
-            },
-          ],
-        },
-      });
+              take: limit,
+            });
       const response = messages.map((msg) => {
         const base = {
           id: msg.id,
