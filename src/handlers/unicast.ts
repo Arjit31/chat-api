@@ -20,6 +20,17 @@ export async function unicastHandler(
       !objId.map.has(received.fromUserId) ||
       objId.map.get(received.fromUserId) != socket
     ) {
+      const obj = {
+        success: false,
+        message: "Invalid Request",
+      };
+      const sendMessage = JSON.stringify(obj);
+      console.log(sendMessage, received);
+      console.log(objId.map.get(received.fromUserId) === socket);
+      console.log(objId.map.has(received.fromUserId));
+      console.log(objId.map.get(received.toUserId) === socket);
+      console.log(objId.map.has(received.toUserId));
+      socket.send(sendMessage);
       socket.close();
       return;
     }
