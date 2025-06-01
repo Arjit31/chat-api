@@ -45,7 +45,7 @@ unicastRouter.get(
           serialNo: msg.serialNo,
           orderNo: msg.serialNo,
           text: msg.text,
-          type: "personal",
+          type: "Personal",
           createdAt: msg.createdAt,
           isSent: msg.fromUserId === fromUserId,
         };

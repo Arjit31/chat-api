@@ -50,7 +50,7 @@ export async function unicastHandler(
       id: personalMessage.id,
       serialNo: personalMessage.serialNo,
       orderNo: personalMessage.serialNo,
-      type: "personal",
+      type: "Personal",
       text: personalMessage.text,
       createdAt: personalMessage.createdAt,
       success: true,
