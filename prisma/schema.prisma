@@ -62,6 +62,9 @@ model PersonalMessage {
 
   toUser   User   @relation("ReceivedMessages", fields: [toUserId], references: [id], onDelete: Cascade)
   toUserId String
+
+  contact    UserContact? @relation(fields: [contactId], references: [id])
+  contactId  String?
 }
 
 model UserContact {
@@ -72,7 +75,8 @@ model UserContact {
   
   adder   User @relation("ContactUser1", fields: [userId1], references: [id], onDelete: Cascade)
   contact User @relation("ContactUser2", fields: [userId2], references: [id], onDelete: Cascade)
-  
+  messages PersonalMessage[]
+
   @@unique([userId1, userId2])
   @@index([userId1])
   @@index([userId2])
