@@ -14,7 +14,6 @@ export async function broadcastHandler(
   objId: objIdType
 ) {
   try {
-    const num = Math.floor(Math.random() * 5) + 1;
     if (
       !received.type ||
       !received.text ||
@@ -34,6 +33,7 @@ export async function broadcastHandler(
       socket.close();
       return;
     }
+    const num = received.type === "Anonymous" ? Math.floor(Math.random() * 5) + 1 : 0;
     const broadcast: {
       randomNo: number;
       type: "Reveal" | "Anonymous";

@@ -25,6 +25,7 @@ export async function connectionHandler(
     }
     jwt.verify(received.connectionToken, process.env.JWT_SECRET || "");
     const decoded = jwt.decode(received.connectionToken) as JwtPayload;
+    console.log(decoded);
     await prisma.token.update({
       where: {
         userId: decoded?.sub,
@@ -35,7 +36,6 @@ export async function connectionHandler(
         isUsedConnectionToken: true
       }
     })
-    console.log(decoded);
     objId.map.set("" + decoded?.sub, socket);
     console.log(objId.map.has(decoded?.sub + ""))
     const obj = {
