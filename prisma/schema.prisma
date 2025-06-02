@@ -25,6 +25,9 @@ model User {
   sentMessages     PersonalMessage[]  @relation("SentMessages")
   receivedMessages PersonalMessage[]  @relation("ReceivedMessages")
   tokens           Token[]
+
+  contactsUser1     UserContact[] @relation("ContactUser1")
+  contactsUser2  UserContact[] @relation("ContactUser2")
 }
 
 model Token {
@@ -33,7 +36,7 @@ model Token {
   connectionTokenId     String  @unique
   isUsedConnectionToken Boolean
   userId                String  @unique
-  user                  User    @relation(fields: [userId], references: [id])
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BroadcastMessage {
@@ -59,6 +62,20 @@ model PersonalMessage {
 
   toUser   User   @relation("ReceivedMessages", fields: [toUserId], references: [id], onDelete: Cascade)
   toUserId String
+}
+
+model UserContact {
+  id        String @id @default(uuid())
+  userId1   String
+  userId2   String
+  createdAt DateTime @default(now())
+  
+  adder   User @relation("ContactUser1", fields: [userId1], references: [id], onDelete: Cascade)
+  contact User @relation("ContactUser2", fields: [userId2], references: [id], onDelete: Cascade)
+  
+  @@unique([userId1, userId2])
+  @@index([userId1])
+  @@index([userId2])
 }
 
 enum MessageType {
