@@ -34,6 +34,23 @@ export async function unicastHandler(
       socket.close();
       return;
     }
+    let contact = await prisma.userContact.findFirst({
+      where: {
+        OR: [
+          { userId1: received.fromUserId, userId2: received.toUserId },
+          { userId1: received.toUserId, userId2: received.fromUserId },
+        ],
+      },
+    });
+
+    if (!contact) {
+      contact = await prisma.userContact.create({
+        data: {
+          userId1: received.fromUserId,
+          userId2: received.toUserId,
+        },
+      });
+    }
     const message: {
       text: string;
       fromUserId: string;
@@ -56,7 +73,7 @@ export async function unicastHandler(
       success: true,
       isSent: true,
       username: "",
-      userId: personalMessage.fromUserId
+      userId: personalMessage.fromUserId,
     };
     objId.map.get(received.fromUserId)?.send(JSON.stringify(sendObj));
     sendObj.isSent = false;

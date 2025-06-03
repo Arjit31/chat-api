@@ -63,7 +63,7 @@ model PersonalMessage {
   toUser   User   @relation("ReceivedMessages", fields: [toUserId], references: [id], onDelete: Cascade)
   toUserId String
 
-  contact    UserContact? @relation(fields: [contactId], references: [id])
+  contact    UserContact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
   contactId  String?
 }
 
