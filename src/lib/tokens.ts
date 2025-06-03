@@ -108,6 +108,7 @@ export async function refreshAllToken(refreshToken: string) {
       accessToken: newAccessTokne,
     };
   } catch (error) {
+    console.log(error);
     return { success: false, error: error };
   }
 }
@@ -127,6 +128,7 @@ export async function refreshAccessToken(refreshToken: string) {
       accessToken: newAccessToken,
     };
   } catch (error) {
+    console.log(error);
     return { success: false, error: error };
   }
 }
