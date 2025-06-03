@@ -14,6 +14,18 @@ contactRouter.get(
         where: {
           OR: [{ userId1: fromUserId }, { userId2: fromUserId }],
         },
+        include: {
+          user1: {
+            select: {
+              name: true,
+            },
+          },
+          user2: {
+            select: {
+              name: true,
+            },
+          },
+        },
       });
       console.log(contacts);
       const resObj = {

@@ -26,8 +26,8 @@ model User {
   receivedMessages PersonalMessage[]  @relation("ReceivedMessages")
   tokens           Token[]
 
-  contactsUser1     UserContact[] @relation("ContactUser1")
-  contactsUser2  UserContact[] @relation("ContactUser2")
+  contactsUser1 UserContact[] @relation("ContactUser1")
+  contactsUser2 UserContact[] @relation("ContactUser2")
 }
 
 model Token {
@@ -63,18 +63,18 @@ model PersonalMessage {
   toUser   User   @relation("ReceivedMessages", fields: [toUserId], references: [id], onDelete: Cascade)
   toUserId String
 
-  contact    UserContact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  contactId  String?
+  contact   UserContact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String?
 }
 
 model UserContact {
-  id        String @id @default(uuid())
+  id        String   @id @default(uuid())
   userId1   String
   userId2   String
   createdAt DateTime @default(now())
-  
-  adder   User @relation("ContactUser1", fields: [userId1], references: [id], onDelete: Cascade)
-  contact User @relation("ContactUser2", fields: [userId2], references: [id], onDelete: Cascade)
+
+  user1    User              @relation("ContactUser1", fields: [userId1], references: [id], onDelete: Cascade)
+  user2    User              @relation("ContactUser2", fields: [userId2], references: [id], onDelete: Cascade)
   messages PersonalMessage[]
 
   @@unique([userId1, userId2])
