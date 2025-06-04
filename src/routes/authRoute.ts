@@ -19,6 +19,51 @@ authRouter.get("/", async function (req: Request, res: Response) {
   res.send("Auth home page");
 });
 
+authRouter.post(
+  "/check-username",
+  async function (req: Request, res: Response) {
+    const { username }: { username: string } = req.body;
+
+    try {
+      if (!username || typeof username !== "string" || !username.trim()) {
+        res.status(400).json({
+          success: false,
+          message: "Username is required",
+        });
+        return;
+      }
+
+      const trimmedUsername = username.trim();
+
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          username: trimmedUsername,
+        },
+      });
+
+      if (existingUser) {
+        res.json({
+          success: true,
+          available: false,
+          message: "Username is already taken",
+        });
+      } else {
+        res.json({
+          success: true,
+          available: true,
+          message: "Username is available",
+        });
+      }
+    } catch (error) {
+      console.error("Error checking username availability:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+);
+
 authRouter.post("/signup", async function (req: Request, res: Response) {
   const data: UserSignupType = req.body;
   try {
