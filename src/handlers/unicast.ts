@@ -1,6 +1,7 @@
 import http from "http";
 import WebSocket from "ws";
 import { prisma } from "../prismaSingletonClient";
+import { unicastMessageSchema } from "../types/Unicast";
 
 type objIdType = {
   map: Map<string, WebSocket>;
@@ -13,16 +14,23 @@ export async function unicastHandler(
   objId: objIdType
 ) {
   try {
+    const result = unicastMessageSchema.safeParse(received);
+    if (!result.success) {
+      const obj = {
+        success: false,
+        message: "Invalid Request, arguments missing or too long",
+      };
+      const sendMessage = JSON.stringify(obj);
+      console.log(sendMessage, received);
+      socket.send(sendMessage);
+    }
     if (
-      !received.text ||
-      !received.fromUserId ||
-      !received.toUserId ||
       !objId.map.has(received.fromUserId) ||
       objId.map.get(received.fromUserId) != socket
     ) {
       const obj = {
         success: false,
-        message: "Invalid Request",
+        message: "Invalid Request, user not authenticated for connection",
       };
       const sendMessage = JSON.stringify(obj);
       console.log(sendMessage, received);

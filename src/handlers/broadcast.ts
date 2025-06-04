@@ -1,11 +1,11 @@
 import { prisma } from "../prismaSingletonClient";
 import http from "http";
 import WebSocket from "ws";
+import { broadcastMessageSchema } from "../types/Broadcast";
 
 type objIdType = {
   map: Map<string, WebSocket>;
 };
-
 
 export async function broadcastHandler(
   wss: WebSocket.Server<typeof WebSocket, typeof http.IncomingMessage>,
@@ -14,10 +14,17 @@ export async function broadcastHandler(
   objId: objIdType
 ) {
   try {
+    const result = broadcastMessageSchema.safeParse(received);
+    if (!result.success) {
+      const obj = {
+        success: false,
+        message: "Invalid Request, arguments missing or too long",
+      };
+      const sendMessage = JSON.stringify(obj);
+      console.log(sendMessage, received);
+      socket.send(sendMessage);
+    }
     if (
-      !received.type ||
-      !received.text ||
-      !received.userId ||
       !objId.map.has(received.userId) ||
       objId.map.get(received.userId) !== socket
     ) {
@@ -33,7 +40,8 @@ export async function broadcastHandler(
       socket.close();
       return;
     }
-    const num = received.type === "Anonymous" ? Math.floor(Math.random() * 5) + 1 : 0;
+    const num =
+      received.type === "Anonymous" ? Math.floor(Math.random() * 5) + 1 : 0;
     const broadcast: {
       randomNo: number;
       type: "Reveal" | "Anonymous";
@@ -63,7 +71,7 @@ export async function broadcastHandler(
       isSent: false,
       success: true,
       username: message.user.name,
-      userId: message.user.id
+      userId: message.user.id,
     };
     wss.clients.forEach(function each(client: WebSocket) {
       if (client.readyState === WebSocket.OPEN) {
@@ -71,7 +79,7 @@ export async function broadcastHandler(
           const userMessage = commonMessage;
           userMessage.isSent = true;
           userMessage.username = "";
-          userMessage.userId = ""
+          userMessage.userId = "";
           userMessage.orderNo += message.randomNo;
           const sentData = JSON.stringify(userMessage);
           client.send(sentData);
