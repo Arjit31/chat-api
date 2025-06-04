@@ -87,6 +87,7 @@ export async function refreshAllToken(refreshToken: string) {
     // console.log(decoded);
     const refreshId = uuidv4();
     const connectionId = uuidv4();
+    console.log(decoded)
     const tokens = await prisma.token.update({
       where: {
         userId: decoded.sub?.toString(),
